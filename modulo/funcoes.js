@@ -19,8 +19,7 @@ function getListaDeTudo(){
 
 function getListaDadosProfile(numero){
 
-    let conteudo
-    let resposta = []
+    let conteudo = null
 
     dados['whats-users'].forEach(function(itemUsers){
 
@@ -35,12 +34,14 @@ function getListaDadosProfile(numero){
             "termino_conta" : itemUsers['created-since'].end
         }
 
-        // resposta.push(conteudo)
     }
     })
 
-    return conteudo
-    // return resposta
+    if(conteudo){
+        return conteudo
+    }else{
+        return false
+    }
 
 }
 
@@ -48,99 +49,111 @@ function getListaDadosProfile(numero){
 
 function getListaDadosContatos(numero){
 
-    let conteudo 
-    let resposta = []
+    let conteudo = []
 
     dados['whats-users'].forEach(function(itemUsers){
 
         if(itemUsers.number == numero){
 
             itemUsers.contacts.forEach(function(itemContato){
-                resposta.push({
-                "nome" : itemContato.name,
-                "foto" : itemContato.image,
-                "descricao" : itemContato.description})
+                conteudo.push({
+                    nome: itemContato.name,
+                    foto: itemContato.image,
+                    descricao: itemContato.description
+                })
             })
         }
     })
 
-    // return resposta
-    return conteudo = {resposta}
+    if(conteudo){
+        return { resposta: conteudo }
+    }else{
+        return false
+    }
+    
 }
 
 // console.log(getListaDadosContatos("11987876567"))
 
 function getListaDeMensagens(numero){
 
-    let conteudo
-
-    let resposta = []
+    let conteudo = []
 
     dados['whats-users'].forEach(function(itemUsers){
 
         if(itemUsers.number === numero){
 
             itemUsers.contacts.forEach(function(itemContato){
-                resposta.push(itemContato.messages)
+                conteudo.push(itemContato.messages)
             })
 
         }
 
     })
 
-    return resposta
-    // return conteudo = {resposta}
-
+    if(conteudo){
+        return { resposta: conteudo }
+    }else{
+        return false
+    }
 }
 
 // console.log(getListaDeMensagens("11987876567"))
 
 function getListaConversaEntreUsuarioEContato(numero, contato){
 
-    let conteudo
-    let resposta = []
+    let conteudo = []
 
     dados['whats-users'].forEach(function(itemUsers){
 
-    if(String(itemUsers.number).toUpperCase().trim() === String(numero).toUpperCase().trim()){
-        itemUsers.contacts.forEach(function(itemContato){
-            if(String(itemContato.name).toUpperCase().trim() === String(contato).toUpperCase().trim()){
-                resposta.push({
-                    "name": itemContato.name,
-                    "description" : itemContato.description,
-                    "messages" : itemContato.messages
-                })
-                
-                return conteudo = {resposta}
-            }
-        })
-    }
+        if(String(itemUsers.number).trim() === String(numero).trim()){
+
+            itemUsers.contacts.forEach(function(itemContato){
+
+                if(String(itemContato.name).toLowerCase().trim().replace(/\s/g, '') === String(contato).toLowerCase().trim().replace(/\s/g, '') ){
+
+                    conteudo.push({
+                        name: itemContato.name,
+                        description: itemContato.description,
+                        messages: itemContato.messages
+                    })
+
+                }
+            })
+        }
     })
 
-    return conteudo
+    if(conteudo){
+        return { resposta: conteudo }
+    }else{
+        return false
+    }
 }
 
-// console.log(getListaConversaEntreUsuarioEContato("11987876567","Jane Smith"))
+// console.log(getListaConversaEntreUsuarioEContato("11987876567","Ana Maria"))
 
 function getFiltrarConversaGeral(numero, nomeContato, termo) {
-    let status = null
-    let resposta = []
-    
+
+    let conteudo = []
 
     dados['whats-users'].forEach(function(itemUsers) {
         
-        if (String(numero).trim() == String(itemUsers.number).trim()) {
+        if (itemUsers.number == numero) {
 
             itemUsers.contacts.forEach(function(itemContato){
                 
-                if(String(nomeContato).trim() == String(itemContato.name).trim()){
+                if (
+                    itemContato.name.replace(/\s/g, '').toLowerCase() ===
+                    nomeContato.replace(/\s/g, '').toLowerCase()
+                ){
                     
                     itemContato.messages.forEach(function(itemMensagem){
                         
-                        if (itemMensagem.content.includes(termo)) {
-                            status = true
-                            resposta.push(itemMensagem)
-                            
+                        if (
+                            itemMensagem.content.toLowerCase()
+                            .includes(termo.toLowerCase())
+                        ){
+                            conteudo.push(itemMensagem)
                         }
                     })
                 }
@@ -148,16 +161,11 @@ function getFiltrarConversaGeral(numero, nomeContato, termo) {
         }
     })
 
-
-    if (!status) {
+    if(conteudo){
+        return { resposta: conteudo }
+    }else{
         return false
     }
-
-    let conteudo = {
-        mensagensFiltradas: resposta
-    }
-
-    return conteudo
 }
 
 // console.log(getFiltrarConversaGeral("11987876567", "Ana Maria", "Not"))
